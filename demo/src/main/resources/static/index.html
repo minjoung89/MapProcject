@@ -1,11 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
-<title>Insert title here</title>
-<script src ="js/index.js"></script>
+	<meta charset="EUC-KR">
+	<title>Insert title here</title> 
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+	<script src ="js/index.js"></script>
+	<script src="app/route.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/index.css"> 
 </head>
-<body>
-abc
+<body ng-app="myApp">
+	<nav>
+	  <div class="container">
+	    <ul>
+	      <li><a href="#/home">Home</a></li>
+	      <li><a href="#/login">Login</a></li>
+	    </ul>
+	  </div>
+	</nav>
+	<div ng-view></div>
+	
+<script>
+var app = angular.module("myApp", ["ngRoute"]);
+app.config(function($routeProvider) {
+  $routeProvider
+  .when("/", {
+    templateUrl : "home.html"
+  })
+  .when("/login", {
+    templateUrl : "login.html"
+  });
+});
+</script>
 </body>
 </html>
