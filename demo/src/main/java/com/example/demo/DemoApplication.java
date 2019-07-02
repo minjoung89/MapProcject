@@ -23,7 +23,6 @@ public class DemoApplication implements CommandLineRunner{
 	
 	@Override
 	public void run(String... args) throws Exception{
-		System.out.println("dddddddddddddddddddd");
 		// user 생성
 		User user = new User();
 		user.setId("test");
@@ -42,7 +41,7 @@ public class DemoApplication implements CommandLineRunner{
 			
 			// 암호화
 			byte[] encryptPassword = cipher.doFinal(password.getBytes("UTF-8"));
-			System.out.println(new String(encryptPassword));
+			//System.out.println(new String(encryptPassword));
 
 			user.setPswd(new String(encryptPassword));
 			
