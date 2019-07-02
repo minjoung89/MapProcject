@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="EUC-KR">
+	<meta charset="utf-8">
 	<title>Insert title here</title> 
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
-	<script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
 	<script src ="js/index.js"></script>
 	<script src="app/route.js"></script>
+	<script src="app/controller.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/index.css"> 
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=332492231ba37e501743482e3ca5d0d4&libraries=services"></script>
     
@@ -17,6 +18,7 @@
 	  <div class="container">
 	    <ul>
 	      <li><a href="#!">Home</a></li>
+	      <li id="li-history"><a href="#!history" id ="historyMenu">History</a></li>
 	      <li><a href="#!login" id ="loginMenu">Login</a></li>
 	    </ul>
 	  </div>

@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.crypto.Cipher;
@@ -16,8 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.demo.dto.History;
+import com.example.demo.dto.HistoryResultDto;
 import com.example.demo.dto.LoginResultDto;
+import com.example.demo.dto.Popular;
+import com.example.demo.dto.PopularResultDto;
 import com.example.demo.dto.User;
+import com.example.demo.service.HisService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -25,6 +33,8 @@ import com.example.demo.service.UserService;
 public class MainController {
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private HisService hisService;
 		
 	@PostMapping("/user")
 	public ResponseEntity<Void> createUser(@RequestBody User user,UriComponentsBuilder builder) {
@@ -96,6 +106,57 @@ public class MainController {
 			loginResultDto.setErrMsg("아이디가 존재하지 않습니다.");
 			return new ResponseEntity<LoginResultDto>(loginResultDto,HttpStatus.OK);
 		}		
+	}
+	
+
+	@PostMapping("/regHistory")
+	public ResponseEntity<Void> createHistory(@RequestBody History history,UriComponentsBuilder builder) {
+		System.out.println("+++++++id: "+history.getId()+"/keyword: "+history.getKeyword()+"/srchDt: "+history.getSrchDt());
+		boolean flag = hisService.createHistory(history);
+        if (flag == false) {
+        	return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+        }
+        //HttpHeaders headers = new HttpHeaders();
+		//headers.setLocation(builder.path("index").buildAndExpand(user.getId()).toUri());
+		return new ResponseEntity<Void>(HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/history/{id}")
+	public ResponseEntity<HistoryResultDto> getHistoryListById(@PathVariable String id) {
+		System.out.println("+++++++id: "+id);
+		List<History> historyList = hisService.getHistoryListById(id);
+		int totalcount = 0;
+		if(historyList != null && historyList.size() > 0){	// exist
+			totalcount=historyList.size();
+			
+		}	
+		HistoryResultDto historyResultDto = new HistoryResultDto();
+		historyResultDto.setHistoryList(historyList);
+		historyResultDto.setTotalcount(totalcount);
+		
+		return new ResponseEntity<HistoryResultDto>(historyResultDto, HttpStatus.OK);
+	}
+	
+	@GetMapping("/popular")
+	public ResponseEntity<PopularResultDto> getPopularList() {
+		System.out.println("+++++++popular 조회");
+		List<Map<String, Object>> popularMapList = hisService.getPopularList();
+		PopularResultDto popularResultDto = new PopularResultDto();
+		int totalcount = 0;
+		if(popularMapList != null && popularMapList.size() > 0){	// exist
+			totalcount=popularMapList.size();
+			List<Popular> popularList = new ArrayList<Popular>();
+			for(Map<String, Object> popularMap : popularMapList) {
+				Popular popular = new Popular();
+				popular.setKeyword(popularMap.get("KEYWORD").toString());
+				popular.setCount(Integer.parseInt(popularMap.get("COUNT").toString()));
+				popularList.add(popular);
+			}
+			popularResultDto.setPopularList(popularList);
+		}	
+		popularResultDto.setTotalcount(totalcount);
+		
+		return new ResponseEntity<PopularResultDto>(popularResultDto, HttpStatus.OK);
 	}
 	
 }
