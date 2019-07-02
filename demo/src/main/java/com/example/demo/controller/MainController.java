@@ -46,24 +46,9 @@ public class MainController {
 		//headers.setLocation(builder.path("index").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(HttpStatus.CREATED);
 	}
-	
-	@GetMapping("/user/{id}")
-	public ResponseEntity<User> userList(@PathVariable String id) {
-		System.out.println("+++++++id: "+id);
-		Optional<User> user = userService.getUser(id); 
-		
-		if(user.isPresent()){	//exist
-			return new ResponseEntity<User>(user.get(), HttpStatus.OK);
-		}
-		else{
-			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
-		}		
-	}
-	
 
 	@PostMapping("/login")
 	public ResponseEntity<LoginResultDto> login(@RequestBody User user,UriComponentsBuilder builder) {
-		System.out.println("++++++++id: "+user.getId()+"/ pswd : "+user.getPswd());
 		Optional<User> currentUser = userService.getUser(user.getId());
 		LoginResultDto loginResultDto = new LoginResultDto();
 		if(currentUser.isPresent()){	//exist
@@ -72,7 +57,7 @@ public class MainController {
 			String currentPswd = currentUser.get().getPswd();
 			
 			// 입력 비밀번호 암호화
-			String key = "this is password"; //16바이트 길이 제한 있음...
+			String key = "this is password"; //16바이트 길이 제한 
 			
 			try {
 				// Cipher 객체 생성
@@ -126,12 +111,11 @@ public class MainController {
 		System.out.println("+++++++id: "+id);
 		List<History> historyList = hisService.getHistoryListById(id);
 		int totalcount = 0;
+		HistoryResultDto historyResultDto = new HistoryResultDto();
 		if(historyList != null && historyList.size() > 0){	// exist
 			totalcount=historyList.size();
-			
+			historyResultDto.setHistoryList(historyList);			
 		}	
-		HistoryResultDto historyResultDto = new HistoryResultDto();
-		historyResultDto.setHistoryList(historyList);
 		historyResultDto.setTotalcount(totalcount);
 		
 		return new ResponseEntity<HistoryResultDto>(historyResultDto, HttpStatus.OK);
@@ -139,7 +123,6 @@ public class MainController {
 	
 	@GetMapping("/popular")
 	public ResponseEntity<PopularResultDto> getPopularList() {
-		System.out.println("+++++++popular 조회");
 		List<Map<String, Object>> popularMapList = hisService.getPopularList();
 		PopularResultDto popularResultDto = new PopularResultDto();
 		int totalcount = 0;

@@ -6,7 +6,6 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
-	<script src ="js/index.js"></script>
 	<script src="app/route.js"></script>
 	<script src="app/controller.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/index.css"> 
@@ -14,15 +13,17 @@
     
 </head>
 <body ng-app="myApp">
-	<nav>
+	<nav style='padding-bottom:1px;'>
 	  <div class="container">
 	    <ul>
-	      <li><a href="#!">Home</a></li>
+	      <li><a href="#!">Map</a></li>
 	      <li id="li-history"><a href="#!history" id ="historyMenu">History</a></li>
 	      <li><a href="#!login" id ="loginMenu">Login</a></li>
 	    </ul>
 	  </div>
 	</nav>
-	<div ng-view></div>
+	<div style='padding:1px'>
+		<div ng-view ></div>
+	</div>
 </body>
 </html>

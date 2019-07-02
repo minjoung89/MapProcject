@@ -1,11 +1,6 @@
 app.controller('loginCtrl', function($scope) {
 	// 로그인 체크
-	if(sessionStorage.getItem("id") == null) {
-		document.getElementById('loginMenu').innerHTML  ="Login";
-	}
-	else{
-		document.getElementById('loginMenu').innerHTML  ="Logout";		
-	}
+	checkLogin();
 	
 	$(document).ready(function(){
 		$("#loginBtn").click(function() { 
@@ -49,13 +44,7 @@ app.controller('loginCtrl', function($scope) {
 });
 app.controller('homeCtrl', function($scope) {
 	// 로그인 체크
-	console.log("로그인된 유저 : "+sessionStorage.getItem("id"));
-	if(sessionStorage.getItem("id") == null) {
-		document.getElementById('loginMenu').innerHTML  ="Login";
-	}
-	else{
-		document.getElementById('loginMenu').innerHTML  ="Logout";		
-	}
+	checkLogin();
 	
 	// 마커를 담을 배열입니다
 	var markers = [];
@@ -76,13 +65,14 @@ app.controller('homeCtrl', function($scope) {
 	var infowindow = new kakao.maps.InfoWindow({zIndex:1});
 
 	// 키워드로 장소를 검색합니다
-	searchPlaces();
+	var keyword = document.getElementById('keyword').value;
+	if (keyword.replace(/^\s+|\s+$/g, '')) {
+		searchPlaces();	
+	}
 
 	// 키워드 검색을 요청하는 함수입니다
 	function searchPlaces() {
-
-	    var keyword = document.getElementById('keyword').value;
-
+		var keyword = document.getElementById('keyword').value;
 	    if (!keyword.replace(/^\s+|\s+$/g, '')) {
 	        alert('키워드를 입력해주세요!');
 	        return false;
@@ -91,12 +81,14 @@ app.controller('homeCtrl', function($scope) {
 	    // 키워드를 저장합니다.
 	    registerHistory(keyword);
 	    
+	        
 	    // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
 	    ps.keywordSearch( keyword, placesSearchCB); 
 	}
 
 	// 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
 	function placesSearchCB(data, status, pagination) {
+		
 	    if (status === kakao.maps.services.Status.OK) {
 
 	        // 정상적으로 검색이 완료됐으면
@@ -135,7 +127,7 @@ app.controller('homeCtrl', function($scope) {
 	    removeMarker();
 	    
 	    for ( var i=0; i<places.length; i++ ) {
-
+	    	console.log(places[i]);
 	        // 마커를 생성하고 지도에 표시합니다
 	        var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x),
 	            marker = addMarker(placePosition, i), 
@@ -148,9 +140,9 @@ app.controller('homeCtrl', function($scope) {
 	        // 마커와 검색결과 항목에 mouseover 했을때
 	        // 해당 장소에 인포윈도우에 장소명을 표시합니다
 	        // mouseout 했을 때는 인포윈도우를 닫습니다
-	        (function(marker, title) {
+	        (function(marker, title, address) {
 	            kakao.maps.event.addListener(marker, 'mouseover', function() {
-	                displayInfowindow(marker, title);
+	                displayInfowindow(marker, title,address);
 	            });
 
 	            kakao.maps.event.addListener(marker, 'mouseout', function() {
@@ -158,13 +150,13 @@ app.controller('homeCtrl', function($scope) {
 	            });
 
 	            itemEl.onmouseover =  function () {
-	                displayInfowindow(marker, title);
+	                displayInfowindow(marker, title,address);
 	            };
 
 	            itemEl.onmouseout =  function () {
 	                infowindow.close();
 	            };
-	        })(marker, places[i].place_name);
+	        })(marker, places[i].place_name, places[i].address_name);
 
 	        fragment.appendChild(itemEl);
 	    }
@@ -263,8 +255,9 @@ app.controller('homeCtrl', function($scope) {
 
 	// 검색결과 목록 또는 마커를 클릭했을 때 호출되는 함수입니다
 	// 인포윈도우에 장소명을 표시합니다
-	function displayInfowindow(marker, title) {
-	    var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
+	function displayInfowindow(marker, title, address) {
+		console.log(address);
+	    var content = '<div style="padding:5px;"><b>' + title +'</b>&nbsp'+address +'</div>';
 
 	    infowindow.setContent(content);
 	    infowindow.open(map, marker);
@@ -293,6 +286,8 @@ app.controller('homeCtrl', function($scope) {
 
 app.controller('historyCtrl', function($scope) {
 	console.log("historyCtrl");
+	checkLogin();
+	
 	$(document).ready(function() {
 		console.log("historyCtrl ready");
 		//Default Action
@@ -324,7 +319,8 @@ app.controller('historyCtrl', function($scope) {
 	});
 });
 function searchHistoryList(){
-	if(sessionStorage.getItem("id") != null){
+	
+	if(sessionStorage.getItem("id")){// 로그인 되어있으면
 		document.getElementById("tab1").innerHTML="";
 
 		fetch('http://localhost:8080/restful/api/history/'+sessionStorage.getItem("id"))
@@ -334,17 +330,23 @@ function searchHistoryList(){
 		  .then(function(myJson) {
 		    console.log(myJson);
 		    $('#tab1').append("<ul class='tab1-ul' style='size:10px'></ul>");
+		    $('#tab1').append("<table class='tab1-table' border=1 ><tr bgcolor='#C0C0C0'><th width=50%>날짜</th><th width=50%>키워드</th></tr></table>");
 		    var historyList = myJson.historyList;
 		    for(var i =0 ; i < myJson.totalcount; i++){
 		    	console.log(i);
-		    	 $('.tab1-ul').append("<li>날짜 : "+historyList[i].srchDt+"&nbsp&nbsp&nbsp검색어 : "+historyList[i].keyword+"</li>");
+		    	 //$('.tab1-ul').append("<li>날짜 : "+historyList[i].srchDt+"&nbsp&nbsp&nbsp검색어 : "+historyList[i].keyword+"</li>");
+		    	//날짜 형식 변환
+		    	var date = new Date(historyList[i].srchDt); 
+		    	var dateString = date.getFullYear()+"년 "+date.getMonth()+"월 "+date.getDate()+"일 "
+		    					+date.getHours()+"시 "+date.getMinutes()+"분 "+date.getSeconds()+"초";
+		    	 $('.tab1-table').append("<tr align='center'><td>"+dateString+"</td><td>"+historyList[i].keyword+"</td></tr>");
 		    }
 		   
 		  })
 		  .catch(error => console.error(error));
 	}
-	else{
-		document.getElementById("tab1").innerHTML="로그인 이 필요한 서비스입니다.";
+	else{// 로그인 되어있지 않으면
+		document.getElementById("tab1").innerHTML="<span style='color: #126d9b'>로그인이 필요한 서비스입니다.</span>";
 	}
 }
 
@@ -360,7 +362,7 @@ function searchPopularList(){
 	    var popularList = myJson.popularList;
 	    for(var i =0 ; i < myJson.totalcount; i++){
 	    	console.log(i);
-	    	 $('.tab2-ul').append("<li>"+(i+1)+"위 :  "+popularList[i].keyword+"("+popularList[i].count+")</li>");
+	    	 $('.tab2-ul').append("<li style='height: 31px;'>"+(i+1)+"위 :  "+popularList[i].keyword+"("+popularList[i].count+"건)</li>");
 	    }
 	  })
 	  .catch(error => console.error(error));
@@ -368,7 +370,7 @@ function searchPopularList(){
 
 function registerHistory(keyword){
 	var id = sessionStorage.getItem("id");
-	if(id == null){
+	if(!id){
 		id ="tmp";
 	}
 	var data = {
@@ -396,4 +398,14 @@ function registerHistory(keyword){
 	  }) // JSON from `response.json()` call
 	  .catch(error => console.error(error));
 
+}
+
+function checkLogin(){
+	// 로그인 체크
+	if(!sessionStorage.getItem("id")) {
+		document.getElementById('loginMenu').innerHTML  ="Login";
+	}
+	else{
+		document.getElementById('loginMenu').innerHTML  ="Logout";		
+	}
 }

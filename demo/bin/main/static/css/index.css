@@ -1,16 +1,16 @@
 @charset "EUC-KR";
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,700,500);
-html { box-sizing: border-box; }
-
-*, *:before, *:after { box-sizing: inherit; }
-
+html { 
+	box-sizing: border-box; 
+	height:100%
+	}
 body {
   background: #fafafa;
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   margin: 0;
 }
-h1 { text-align:center; margin-top:150px;}
+h1 { text-align:center; margin-top:30px;}
 
 nav { background: #2ba0db; }
 
@@ -28,9 +28,10 @@ nav ul li {
 nav ul li a {
   color: #fff;
   display: block;
-  font-size: 14px;
-  padding: 15px 14px;
+  font-size: 18px;
+  padding: 15px 20px;
   transition: 0.3s linear;
+  text-decoration:none;
 }
 
 nav ul li:hover { background: #126d9b; }
@@ -58,3 +59,14 @@ nav ul li ul li a {
 nav ul li ul li a:hover { background: #126d9b; }
 
 nav .fa.fa-angle-down { margin-left: 6px; }
+
+table{
+	width:100%;
+}
+table, th, td{
+	border-collapse: collapse;
+	border: 1px solid #A2A2A2;
+	padding: 5;
+	font-size: 9pt;
+	font-family:"Roboto", sans-serif;
+}

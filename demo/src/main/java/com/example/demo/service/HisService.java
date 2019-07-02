@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.History;
-import com.example.demo.dto.Popular;
 import com.example.demo.repository.HisRepository;
 
 
