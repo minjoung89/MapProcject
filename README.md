@@ -1,11 +1,11 @@
 # MapProcject
-# 초기 생성 계정
-id : test <br>
-password : 123456
-
 # Executable jar 파일 경로 
 (25MB가 넘어서 github에 업로드가 되지 않습니다.) <br>
 https://drive.google.com/open?id=1-_rg1A-haKfdWaglEnSsL4vJir99Kn1f 
+
+# 초기 생성 계정
+id : test <br>
+password : 123456
 
 # 사용한 라이브러리
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
