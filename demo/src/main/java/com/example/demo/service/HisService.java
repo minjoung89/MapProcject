@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.History;
-import com.example.demo.repository.HisRepository;
+import com.example.demo.repository.HistoryRepository;
 
 
 @Service
 public class HisService {
 	@Autowired
-	private HisRepository hisRepository;
+	private HistoryRepository historyRepository;
 	
 	public boolean createHistory(History history){
 		try{
-			hisRepository.save(history);
+			historyRepository.save(history);
 			return true;
 		}
 		catch(Exception e){
@@ -27,14 +27,14 @@ public class HisService {
 	
 	public List<History> getHistoryListById(String id){
 
-	    return hisRepository.findListById(id);
+	    return historyRepository.findListById(id);
 	    
 	}
 	
 
 	public List<Map<String, Object>> getPopularList(){
 
-	    return hisRepository.findPopularList();
+	    return historyRepository.findPopularList();
 	    
 	}
 }

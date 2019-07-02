@@ -46,6 +46,56 @@ app.controller('homeCtrl', function($scope) {
 	// 로그인 체크
 	checkLogin();
 	
+	callKakaoApi();
+
+	$(document).ready(function(){
+		 // 로그아웃처리
+		 $("#loginMenu").click(function() {
+			 if(document.getElementById('loginMenu').innerHTML =="Logout") { //로그아웃 메뉴 클릭
+				 sessionStorage.removeItem("id");
+				location.href='#!/login';			
+			 }
+		 });
+	});
+});
+
+app.controller('historyCtrl', function($scope) {
+	//console.log("historyCtrl");
+	checkLogin();
+	
+	$(document).ready(function() {
+		//console.log("historyCtrl ready");
+		//Default Action
+		$(".tab_content").hide(); //Hide all content
+		$("ul.tabs li:first").addClass("active").show(); //Activate first tab
+		$(".tab_content:first").show(); //Show first tab content
+		
+		//On Click Event
+		$("ul.tabs li").click(function() {
+			$("ul.tabs li").removeClass("active"); //Remove any "active" class
+			$(this).addClass("active"); //Add "active" class to selected tab
+			$(".tab_content").hide(); //Hide all tab content
+			var activeTab = $(this).find("a").attr("href"); //Find the rel attribute value to identify the active tab + content
+			$(activeTab).fadeIn(); //Fade in the active content
+			return false;
+		});
+		
+		// 최근 검색이력 조회하기
+		searchHistoryList();
+		
+		$("#tab1Btn").click(function() {
+			// 최근 검색이력 조회하기
+			searchHistoryList();
+		});
+		$("#tab2Btn").click(function() {
+			// 인기검색어 조죄하기
+			searchPopularList();
+		});
+	});
+});
+
+function callKakaoApi(){
+
 	// 마커를 담을 배열입니다
 	var markers = [];
 
@@ -127,7 +177,7 @@ app.controller('homeCtrl', function($scope) {
 	    removeMarker();
 	    
 	    for ( var i=0; i<places.length; i++ ) {
-	    	console.log(places[i]);
+	    	//console.log(places[i]);
 	        // 마커를 생성하고 지도에 표시합니다
 	        var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x),
 	            marker = addMarker(placePosition, i), 
@@ -256,7 +306,7 @@ app.controller('homeCtrl', function($scope) {
 	// 검색결과 목록 또는 마커를 클릭했을 때 호출되는 함수입니다
 	// 인포윈도우에 장소명을 표시합니다
 	function displayInfowindow(marker, title, address) {
-		console.log(address);
+		//console.log(address);
 	    var content = '<div style="padding:5px;"><b>' + title +'</b>&nbsp'+address +'</div>';
 
 	    infowindow.setContent(content);
@@ -269,55 +319,16 @@ app.controller('homeCtrl', function($scope) {
 	        el.removeChild (el.lastChild);
 	    }
 	}
-
+	
 	$(document).ready(function(){
 		 $("#srchBtn").click(function() { 
 			 searchPlaces();
 		 });
-		 // 로그아웃처리
-		 $("#loginMenu").click(function() {
-			 if(document.getElementById('loginMenu').innerHTML =="Logout") { //로그아웃 메뉴 클릭
-				 sessionStorage.removeItem("id");
-				location.href='#!/login';			
-			 }
-		 });
 	});
-});
-
-app.controller('historyCtrl', function($scope) {
-	console.log("historyCtrl");
-	checkLogin();
-	
-	$(document).ready(function() {
-		console.log("historyCtrl ready");
-		//Default Action
-		$(".tab_content").hide(); //Hide all content
-		$("ul.tabs li:first").addClass("active").show(); //Activate first tab
-		$(".tab_content:first").show(); //Show first tab content
-		
-		//On Click Event
-		$("ul.tabs li").click(function() {
-			$("ul.tabs li").removeClass("active"); //Remove any "active" class
-			$(this).addClass("active"); //Add "active" class to selected tab
-			$(".tab_content").hide(); //Hide all tab content
-			var activeTab = $(this).find("a").attr("href"); //Find the rel attribute value to identify the active tab + content
-			$(activeTab).fadeIn(); //Fade in the active content
-			return false;
-		});
-		
-		// 최근 검색이력 조회하기
-		searchHistoryList();
-		
-		$("#tab1Btn").click(function() {
-			// 최근 검색이력 조회하기
-			searchHistoryList();
-		});
-		$("#tab2Btn").click(function() {
-			// 인기검색어 조죄하기
-			searchPopularList();
-		});
-	});
-});
+}
+/**
+ * 최근 검색어 조회 (id별 조회)
+ */
 function searchHistoryList(){
 	
 	if(sessionStorage.getItem("id")){// 로그인 되어있으면
@@ -329,19 +340,18 @@ function searchHistoryList(){
 		  })
 		  .then(function(myJson) {
 		    console.log(myJson);
-		    $('#tab1').append("<ul class='tab1-ul' style='size:10px'></ul>");
-		    $('#tab1').append("<table class='tab1-table' border=1 ><tr bgcolor='#C0C0C0'><th width=50%>날짜</th><th width=50%>키워드</th></tr></table>");
 		    var historyList = myJson.historyList;
-		    for(var i =0 ; i < myJson.totalcount; i++){
-		    	console.log(i);
-		    	 //$('.tab1-ul').append("<li>날짜 : "+historyList[i].srchDt+"&nbsp&nbsp&nbsp검색어 : "+historyList[i].keyword+"</li>");
-		    	//날짜 형식 변환
-		    	var date = new Date(historyList[i].srchDt); 
-		    	var dateString = date.getFullYear()+"년 "+date.getMonth()+"월 "+date.getDate()+"일 "
-		    					+date.getHours()+"시 "+date.getMinutes()+"분 "+date.getSeconds()+"초";
-		    	 $('.tab1-table').append("<tr align='center'><td>"+dateString+"</td><td>"+historyList[i].keyword+"</td></tr>");
+		    if(myJson.totalcount> 0){
+			    $('#tab1').append("<table class='tab1-table' border=1 ><tr bgcolor='#C0C0C0'><th width=50%>날짜</th><th width=50%>키워드</th></tr></table>");
+			    for(var i =0 ; i < myJson.totalcount; i++){
+			    	//console.log(i);
+			    	//날짜 형식 변환
+			    	var date = new Date(historyList[i].srchDt); 
+			    	var dateString = date.getFullYear()+"년 "+(date.getMonth()+1)+"월 "+date.getDate()+"일 "
+			    					+date.getHours()+"시 "+date.getMinutes()+"분 "+date.getSeconds()+"초";
+			    	 $('.tab1-table').append("<tr align='center'><td>"+dateString+"</td><td>"+historyList[i].keyword+"</td></tr>");
+			    }
 		    }
-		   
 		  })
 		  .catch(error => console.error(error));
 	}
@@ -350,6 +360,9 @@ function searchHistoryList(){
 	}
 }
 
+/**
+ * 인기 검색어 조회
+ */
 function searchPopularList(){
 	document.getElementById("tab2").innerHTML="";
 	fetch('http://localhost:8080/restful/api/popular')
@@ -357,12 +370,16 @@ function searchPopularList(){
 	    return response.json(); //Json body 추출
 	  })
 	  .then(function(myJson) {
-	    console.log(myJson);
-	    $('#tab2').append("<ul class='tab2-ul' style='list-style-type: none;'></ul>");
+	    //console.log(myJson);    
 	    var popularList = myJson.popularList;
-	    for(var i =0 ; i < myJson.totalcount; i++){
-	    	console.log(i);
-	    	 $('.tab2-ul').append("<li style='height: 31px;'>"+(i+1)+"위 :  "+popularList[i].keyword+"("+popularList[i].count+"건)</li>");
+	    if(myJson.totalcount > 0){
+	    	$('#tab2').append("<table class='tab2-table' border=1 ><tr bgcolor='#C0C0C0'><th width=20%>순위</th><th width=60%>키워드</th><th width=20%>건수</th></tr></table>");
+	    
+		    for(var i =0 ; i < myJson.totalcount; i++){
+		    	//console.log(i);
+		    	 //$('.tab2-ul').append("<li style='height: 31px;'>"+(i+1)+"위 :  "+popularList[i].keyword+"("+popularList[i].count+"건)</li>");
+		    	 $('.tab2-table').append("<tr align='center'><td>"+(i+1)+"위 </td><td>"+popularList[i].keyword+"</td><td>"+popularList[i].count+"건</td></tr>");
+		    }
 	    }
 	  })
 	  .catch(error => console.error(error));
@@ -391,12 +408,9 @@ function registerHistory(keyword){
 	    redirect: 'follow', // *manual, follow, error
 	    referrer: 'no-referrer', // *client, no-referrer
 	  })
-	  .then(response => response.json()) // parses response to JSON
-	  .then(function(data){
-		  	console.log(data);
-		    
-	  }) // JSON from `response.json()` call
-	  .catch(error => console.error(error));
+	  .then(function(response){
+		  	console.log(response);		  
+	  })
 
 }
 

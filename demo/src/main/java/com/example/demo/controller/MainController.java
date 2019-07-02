@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,8 +41,8 @@ public class MainController {
 	public ResponseEntity<Void> createUser(@RequestBody User user,UriComponentsBuilder builder) {
 		boolean flag = userService.createUser(user);
         if (flag == false) {
-   	    return new ResponseEntity<Void>(HttpStatus.CONFLICT);
-           }
+        	return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+        }
         //HttpHeaders headers = new HttpHeaders();
 		//headers.setLocation(builder.path("index").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(HttpStatus.CREATED);
@@ -49,27 +50,21 @@ public class MainController {
 
 	@PostMapping("/login")
 	public ResponseEntity<LoginResultDto> login(@RequestBody User user,UriComponentsBuilder builder) {
-		Optional<User> currentUser = userService.getUser(user.getId());
 		LoginResultDto loginResultDto = new LoginResultDto();
+		if(StringUtils.isEmpty(user.getId())) {
+			loginResultDto.setErrYn(true);
+			loginResultDto.setErrMsg("아이디를 입력해주세요.");
+			return new ResponseEntity<LoginResultDto>(loginResultDto, HttpStatus.FORBIDDEN);
+		}
+		Optional<User> currentUser = userService.getUser(user.getId());
 		if(currentUser.isPresent()){	//exist
 			// 비밀번호 검증
 			String inputPswd = user.getPswd();
 			String currentPswd = currentUser.get().getPswd();
 			
-			// 입력 비밀번호 암호화
-			String key = "this is password"; //16바이트 길이 제한 
 			
 			try {
-				// Cipher 객체 생성
-				Cipher cipher = Cipher.getInstance("AES");
-				
-				// Cipher 객체 초기화
-				SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "AES");
-				cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-				
-				// 암호화
-				byte[] encryptPassword = cipher.doFinal(inputPswd.getBytes("UTF-8"));
-				System.out.println(new String(encryptPassword));
+				String encryptPassword = encryptPswd(inputPswd);
 				
 				// 현재비밀번호와 일치하는지 검증
 				if(new String(encryptPassword).equals(currentPswd)) { // 일치함
@@ -82,8 +77,10 @@ public class MainController {
 					loginResultDto.setErrMsg("잘못된 비밀번호입니다.");
 					return new ResponseEntity<LoginResultDto>(loginResultDto, HttpStatus.OK);
 				}
+				
 			} catch (Exception e) {
-				return new ResponseEntity<LoginResultDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+				System.out.println(e.getMessage());
+				return new ResponseEntity<LoginResultDto>( HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		else{ // not exist
@@ -93,10 +90,27 @@ public class MainController {
 		}		
 	}
 	
+	private String encryptPswd(String pswd) throws Exception {
+		// 입력 비밀번호 암호화
+		String key = "this is password"; //16바이트 길이 제한 
+		
+		// Cipher 객체 생성
+		Cipher cipher = Cipher.getInstance("AES");
+		
+		// Cipher 객체 초기화
+		SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "AES");
+		cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+		
+		// 암호화
+		byte[] encryptPassword = cipher.doFinal(pswd.getBytes("UTF-8"));
+		System.out.println(new String(encryptPassword));
+		
+		return new String(encryptPassword);
+	}
 
 	@PostMapping("/regHistory")
 	public ResponseEntity<Void> createHistory(@RequestBody History history,UriComponentsBuilder builder) {
-		System.out.println("+++++++id: "+history.getId()+"/keyword: "+history.getKeyword()+"/srchDt: "+history.getSrchDt());
+		//System.out.println("+++++++id: "+history.getId()+"/keyword: "+history.getKeyword()+"/srchDt: "+history.getSrchDt());
 		boolean flag = hisService.createHistory(history);
         if (flag == false) {
         	return new ResponseEntity<Void>(HttpStatus.CONFLICT);
@@ -108,8 +122,9 @@ public class MainController {
 	
 	@GetMapping("/history/{id}")
 	public ResponseEntity<HistoryResultDto> getHistoryListById(@PathVariable String id) {
-		System.out.println("+++++++id: "+id);
-		List<History> historyList = hisService.getHistoryListById(id);
+		List<History> historyList = null;
+		historyList = hisService.getHistoryListById(id);	
+		
 		int totalcount = 0;
 		HistoryResultDto historyResultDto = new HistoryResultDto();
 		if(historyList != null && historyList.size() > 0){	// exist
