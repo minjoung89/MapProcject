@@ -11,7 +11,7 @@ password : 123456
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=[APP_KEY]&libraries=services"></script>
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=[APP_KEY]&libraries=services"></script>
   
 # 개발환경
   - JAVA 8
