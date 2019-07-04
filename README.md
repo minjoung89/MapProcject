@@ -1,7 +1,8 @@
 # MapProject
-# Executable jar 파일 경로 
+# Executable jar 파일 경로  => google문서에서 github로 경로 변경하였습니다.
 (25MB가 넘어서 github에 업로드가 되지 않습니다.) <br>
 https://drive.google.com/open?id=1-_rg1A-haKfdWaglEnSsL4vJir99Kn1f 
+=> https://github.com/minjoung89/MapProcject/tree/master/demo/jar 
 
 # 초기 생성 계정
 id : test <br>
